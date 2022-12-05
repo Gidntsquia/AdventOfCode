@@ -42,5 +42,4 @@ if __name__ == "__main__":
     for stack in stacks:
         print(stack)
             
-    
-    
+    f.close()
