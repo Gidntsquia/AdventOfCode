@@ -1,5 +1,5 @@
 # Advent Of Code 🎄
-My code for December 2022's [Advent of Code](https://adventofcode.com) puzzles. 
+My code for December 2022's [Advent of Code](https://adventofcode.com) puzzles. All my solutions are in Python.
 
 ## Quickstart 🚀
 ```
