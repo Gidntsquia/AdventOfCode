@@ -10,7 +10,7 @@ import re
 
     
 # 
-# This gives the answer to part 2.
+# This gives the answer to part 1.
 def part1():
     f = open('Day_???/input.txt')
     solution = 0
@@ -32,7 +32,7 @@ def part2():
     for line in f.readlines():
         pass
     
-    print("Part 1 Solution: " + str(solution))
+    print("Part 2 Solution: " + str(solution))
     f.close()
 
 
