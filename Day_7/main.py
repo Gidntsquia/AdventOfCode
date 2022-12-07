@@ -44,11 +44,6 @@ class Directory:
         return result
 
 
-
-
-
-
-
 # This gives the answer to part 1.
 def part1():
     # Get input into array
@@ -149,5 +144,3 @@ if __name__ == "__main__":
     
     part1()
     part2()
-    
-    

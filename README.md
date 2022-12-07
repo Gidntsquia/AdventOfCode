@@ -2,7 +2,8 @@
 My code for December 2022's [Advent of Code](https://adventofcode.com) puzzles. All my solutions are in Python.
 
 ## Today's Solution! (Day 7) 🤗
-```import re
+```
+import re
 # Written by Jaxon Lee (GidntSquia)
 # Advent of Code Day 7
 # 12/7/2022
@@ -46,11 +47,6 @@ class Directory:
     def  __str__(self):
         result = self.name + ": " + str(self.size)
         return result
-
-
-
-
-
 
 
 # This gives the answer to part 1.
