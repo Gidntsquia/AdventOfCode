@@ -1,4 +1,3 @@
-import random
 import re
 # Written by Jaxon Lee (GidntSquia)
 # Advent of Code Day 7
