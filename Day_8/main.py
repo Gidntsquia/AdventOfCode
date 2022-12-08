@@ -9,7 +9,7 @@ import re
 # nums = [int(s) for s in re.findall(r'\d+', line)]
 
     
-# 
+# This finds the number of trees that are visible from outside the forest.
 # This gives the answer to part 1.
 def part1():
     X = [l.strip() for l in open('Day_8/input.txt')] 
@@ -69,7 +69,6 @@ def part1():
                     
             my_row += 1
                 
-    
     # Start from the bottom and look up
     for col in range(0, len(Q[0])):
         heights = []
@@ -93,7 +92,8 @@ def part1():
     print("Part 1 Solution: " + str(solution))
 
 
-# 
+# This finds the "optimal" treehouse location by finding the tree that can see
+# the most trees horizontally/vertically.
 # This gives the answer to part 2.
 def part2():
     X = [l.strip() for l in open('Day_8/input.txt')] 
@@ -150,12 +150,8 @@ def part2():
     print("Part 2 Solution: " + str(solution))
 
     
-
 if __name__ == "__main__":
     print("hello!")
     
-    
     part1()
     part2()
-    
-    
