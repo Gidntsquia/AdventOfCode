@@ -1,162 +1,169 @@
 # Advent Of Code 2022 🎄
 My code for December 2022's [Advent of Code](https://adventofcode.com) puzzles. All my solutions are in Python.
 
-## Today's Solution! (Day 8) 🤗
+## Today's Solution! (Day 9) 🤗
 ```
-import re
+import math
 # Written by Jaxon Lee (GidntSquia)
-# Advent of Code Day 8
-# 12/8/2022
+# Advent of Code Day 9
+# 12/9/2022
 #
 # Feel free to take whatever you'd like!
 
-# Commonly used command- 
-# nums = [int(s) for s in re.findall(r'\d+', line)]
 
-    
-# This finds the number of trees that are visible from outside the forest.
+def distance(p0, p1):
+    return math.sqrt((p0[0] - p1[0])**2 + (p0[1] - p1[1])**2)  
+
+def move(position, change):
+    return tuple(sum(x) for x in zip(position, change))
+
+# This gives the number of squares that the "tail" visited.
 # This gives the answer to part 1.
 def part1():
-    X = [l.strip() for l in open('Day_8/input.txt')] 
-    count = 0
-    accounted_for = set([])
+    solution = 0
+    X = [l.strip() for l in open('Day_9/input.txt')]
     
-    # Start from left and look right
-    my_row = 0
-    for row in X:
-        heights = [int(i) for i in row]
-        my_col = 0
-        biggest = -1
-        for height in heights:
-            if biggest < height:
-                biggest = height
-                if not (my_row, my_col) in accounted_for:
-                    count+= 1
-                    accounted_for.add((my_row, my_col))
-                
-            my_col += 1
-        my_row += 1
+    # Starting positions
+    h_pos = (0, 0)
+    t_pos = (0, 0)
+    
+    # All potential directions
+    moves = {
+        'R': (0, 1),
+        'L': (0, -1),
+        'U': (1, 0),
+        'D': (-1, 0)
+    }
+    
+    visited = set([])
+    
+    visited.add(t_pos)
 
-    # Start from right and look left
-    my_row = 0
-    for row in X:
-        heights = [int(i) for i in row]
-        heights.reverse()
-
-        my_col = 0
-        biggest = -1
-        for height in heights:
-            if biggest < height:
-                biggest = height
-                if not (my_row, len(X[0]) - 1 - my_col) in accounted_for:
-                    count+= 1
-                    accounted_for.add((my_row, len(X[0]) - 1 - my_col))
-            my_col += 1
-            
-        my_row += 1
+    for commands in X:
+        # Get direction and amount we should go in that direction.
+        words = commands.split()
         
-    # Turn list of lines into 2d array of characters
-    Q = [list(line) for line in X]
-    
-    # Start from top and look down
-    for col in range(0, len(Q[0])):
-        heights = []
-        for row in range(0, len(Q)):
-            heights.append(int(Q[row][col]))
-        biggest = -1
-        my_row = 0
-        for height in heights:
-            if biggest < height:
-                biggest = height
-                if not (my_row, col) in accounted_for:
-                    count+= 1
-                    accounted_for.add((my_row, col))
-                    
-            my_row += 1
-                
-    # Start from the bottom and look up
-    for col in range(0, len(Q[0])):
-        heights = []
-        for row in range(0, len(Q)):
-            heights.append(int(Q[row][col]))
-        heights.reverse()
-
-        biggest = -1
-        my_row = 0
-        for height in heights:
-            # Row is correct, but columns are flipped
-            if biggest < height:
-                biggest = height
-                if not (len(Q) - 1 - my_row, col) in accounted_for:
-                    count+= 1
-                    accounted_for.add((len(Q) - 1 - my_row, col))
-            my_row +=1
-    
-    solution = count
+        direction = words[0]
         
+        # Put unit "direction" into change a then iterate as many times as the 
+        # amount specifies.
+        change = moves[direction]
+        for i in range(0, int(words[1])):
+            # Move the head and then move the tail correspondingly.
+            h_pos = move(h_pos, change)
+            (hx, hy) = h_pos
+            (tx, ty) = t_pos
+            distance = (hx - tx, hy - ty)
+            match distance:
+                # Up
+                case (2, 0):
+                    t_pos = move(t_pos, moves['U'])
+                # Down 
+                case (-2, 0):
+                    t_pos = move(t_pos, moves['D'])
+                # Right
+                case (0, 2):
+                    t_pos = move(t_pos, moves['R'])
+                # Left
+                case (0, -2):
+                    t_pos = move(t_pos, moves['L'])
+                # Up and Right
+                case (1, 2) | (2, 1):
+                    t_pos = move(t_pos, moves['U'])
+                    t_pos = move(t_pos, moves['R'])
+                # Down and Right
+                case (-1, 2) | (-2, 1):
+                    t_pos = move(t_pos, moves['D'])
+                    t_pos = move(t_pos, moves['R'])
+                # Up and Left
+                case (1, -2) | (2, -1):
+                    t_pos = move(t_pos, moves['U'])
+                    t_pos = move(t_pos, moves['L'])
+                # Down and Left
+                case (-1, -2) | (-2, -1):
+                    t_pos = move(t_pos, moves['D'])
+                    t_pos = move(t_pos, moves['L'])
+                case _:
+                    pass 
+            visited.add(t_pos)
+    solution = len(visited)
+    
     print("Part 1 Solution: " + str(solution))
 
-
-# This finds the "optimal" treehouse location by finding the tree that can see
-# the most trees horizontally/vertically.
+# This gives the number of squares that the 9th (last) tail finished.
 # This gives the answer to part 2.
 def part2():
-    X = [l.strip() for l in open('Day_8/input.txt')] 
-    Q = [list(line) for line in X]
+    solution = 0
+    X = [l.strip() for l in open('Day_9/input.txt')]
+    rope_positions = [(0,0) for i in range(0, 10)]
     
-    scenics = []
-    # Go through each row/col index and find its scenic score
-    for row in range(0, len(Q)):
-        for col in range(0, len(Q[0])):
-            my_height = Q[row][col]
+    # All potential directions
+    moves = {
+        'R': (0, 1),
+        'L': (0, -1),
+        'U': (1, 0),
+        'D': (-1, 0)
+    }
+    
+    visited = set([])
+    
+    visited.add((0,0))
+    for commands in X:
+        # Move the head and then move each of the tails correspondingly.
+        words = commands.split()
+        direction = words[0]
+        change = moves[direction]
+        for i in range(0, int(words[1])):
+            rope_positions[0] = move(rope_positions[0], change)
+            (hx, hy) = rope_positions[0]
             
-            # 0 is left, 1 is right, 2 is up, and 3 is down.
-            scores = [0, 0, 0, 0]
-           
-             # Go left
-            for col_travel in range(col - 1, -1, -1):
-                if (Q[row][col_travel] < my_height):
-                    scores[0] += 1
-                # View is blocked
-                else:
-                    scores[0] += 1
-                    break
-             # Go right
-            for col_travel in range(col + 1, len(Q[0]), 1):
-                if (Q[row][col_travel] < my_height):
-                    scores[1] += 1
-                # View is blocked
-                else:
-                    scores[1] += 1
-                    break
-            # Go up
-            for row_travel in range(row - 1, -1, -1):
-                if (Q[row_travel][col] < my_height):
-                    scores[2] += 1
-                # View is blocked
-                else:
-                    scores[2] += 1
-                    break
-            # Go down
-            for row_travel in range(row + 1, len(Q), 1):
-                if (Q[row_travel][col] < my_height):
-                    scores[3] += 1
-                # View is blocked
-                else:
-                    scores[3] += 1
-                    break
-                
-            # Calculate scenic scores based on score of each direction.
-            scenic_score = scores[0] * scores[1] * scores[2] * scores[3]
-            scenics.append(scenic_score)
+            # Go through each of the tails and move them if needed.
+            for i in range(1, 10):
+                (tx, ty) = rope_positions[i]
+                distance = (hx - tx, hy - ty)
+                match distance:
+                    # Up
+                    case (2, 0):
+                        rope_positions[i] = move(rope_positions[i], moves['U'])
+                    # Down
+                    case (-2, 0):
+                        rope_positions[i] = move(rope_positions[i], moves['D'])
+                    # Right
+                    case (0, 2):
+                        rope_positions[i] = move(rope_positions[i], moves['R'])
+                    # Left
+                    case (0, -2):
+                        rope_positions[i] = move(rope_positions[i], moves['L'])
+                    # Up and Right
+                    case (1, 2) | (2, 1) | (2, 2):
+                        rope_positions[i] = move(rope_positions[i], moves['U'])
+                        rope_positions[i] = move(rope_positions[i], moves['R'])
+                    # Down and Right
+                    case (-1, 2) | (-2, 1) | (-2, 2):
+                        rope_positions[i] = move(rope_positions[i], moves['D'])
+                        rope_positions[i] = move(rope_positions[i], moves['R'])
+                    # Up and Left
+                    case (1, -2) | (2, -1) | (2, -2):
+                        rope_positions[i] = move(rope_positions[i], moves['U'])
+                        rope_positions[i] = move(rope_positions[i], moves['L'])
+                    # Down adn Left
+                    case (-1, -2) | (-2, -1) | (-2, -2):
+                        rope_positions[i] = move(rope_positions[i], moves['D'])
+                        rope_positions[i] = move(rope_positions[i], moves['L'])
+                    case _:
+                        pass 
+                # Update "head" to last rope's position
+                (hx, hy) = rope_positions[i]
             
-    solution = max(scenics)
-
+            visited.add(rope_positions[9])
+    solution = len(visited)
+    
     print("Part 2 Solution: " + str(solution))
 
-    
+
 if __name__ == "__main__":
     print("hello!")
+    
     
     part1()
     part2()
@@ -169,9 +176,9 @@ git clone https://github.com/Gidntsquia/AdventOfCode
 ## Code Structure 📁
 The code is broken up as follows:
 
-- [📁](Day_8)`Day_*`: Solutions for each day of advent of code. Click to be taken to today's solution
-    - [📋](Day_8/input.txt)`input.txt`: My puzzle input for today (Everyone's is different!)
-    - [🏃](Day_8/main.py)`main.py`: Solution file. Run to get puzzle solution for today (make sure to put in your unique input)
+- [📁](Day_9)`Day_*`: Solutions for each day of advent of code. Click to be taken to today's solution
+    - [📋](Day_9/input.txt)`input.txt`: My puzzle input for today (Everyone's is different!)
+    - [🏃](Day_9/main.py)`main.py`: Solution file. Run to get puzzle solution for today (make sure to put in your unique input)
 - [📁](Template)`Template`: Template for solutions. Feel free to take it
     - [📋](Template/input.txt)`input.txt`: Empty file where you can put in the day's puzzle input 
     - [🏃](Template/main.py)`main.py`: Skeleton of a python file where you can put in the day's puzzle solution.
