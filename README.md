@@ -1,149 +1,160 @@
 # Advent Of Code 2022 🎄
 My code for December 2022's [Advent of Code](https://adventofcode.com) puzzles. All my solutions are in Python.
 
-## Today's Solution! (Day 7) 🤗
+## Today's Solution! (Day 8) 🤗
 ```
 import re
 # Written by Jaxon Lee (GidntSquia)
-# Advent of Code Day 7
-# 12/7/2022
+# Advent of Code Day 8
+# 12/8/2022
 #
 # Feel free to take whatever you'd like!
 
 # Commonly used command- 
 # nums = [int(s) for s in re.findall(r'\d+', line)]
 
-# Inspiration from:  #https://www.youtube.com/@jonathanpaulson5053
-# Put scratch work here.
-
-# This makes a running list of all directories created. Must be reset between
-# parts
-all_dirs = []
-class Directory: 
-    def __init__(self, name, parent):
-        self.name = name
-        self.parent = parent
-        self.children = []
-        self.size = 0
-        self.my_ls = []
-        all_dirs.append(self)
-      
-    def add_child(self, child):
-        self.children.append(child)
     
-    def update_size(self):
-        self.size = 0
-        files = '\n'.join(self.my_ls)
-        
-        # Sum all the non-directory file sizes
-        self.size += sum([int(i) for i in re.findall(r'\d+', files)])
-        
-        # Sum all the directory file sizes recursively.
-        for child_dir in self.children:
-            child_dir.update_size()
-            self.size += child_dir.size
-            
-    # "To string" function for debugging. Today's puzzle was very difficult.
-    def  __str__(self):
-        result = self.name + ": " + str(self.size)
-        return result
-
-
+# This finds the number of trees that are visible from outside the forest.
 # This gives the answer to part 1.
 def part1():
-    # Get input into array
-    X = [l.strip() for l in open('Day_7/input.txt')]   
+    X = [l.strip() for l in open('Day_8/input.txt')] 
+    count = 0
+    accounted_for = set([])
     
-    # Split the input into commands + their output
-    Q =('\n'.join(X)).split("$ ")
+    # Start from left and look right
+    my_row = 0
+    for row in X:
+        heights = [int(i) for i in row]
+        my_col = 0
+        biggest = -1
+        for height in heights:
+            if biggest < height:
+                biggest = height
+                if not (my_row, my_col) in accounted_for:
+                    count+= 1
+                    accounted_for.add((my_row, my_col))
+                
+            my_col += 1
+        my_row += 1
 
-    root_dir = Directory('/', 0)
-    curr_dir = root_dir
-    for command in Q:
-        # Put the command into a nicer format and separate the command and it's
-        # output.
-        my_commands = [s.rstrip() for s in command.split('\n')]
-        if (len(my_commands) > 0):
-            if ('cd' in my_commands[0]):
-                name = ''.join(my_commands).split(' ')[1]
-                if (name == '..'):
-                    curr_dir = curr_dir.parent
-                # "cd /" is only run at the beginning, and we actually want to
-                # ignore it because we already have a root set up outside of the
-                # loop. That's what this does.
-                elif (name == '/'):
-                    pass
-                else:
-                    parent_dir = curr_dir
-                    curr_dir = Directory(name, parent_dir)
-                    parent_dir.add_child(curr_dir)
+    # Start from right and look left
+    my_row = 0
+    for row in X:
+        heights = [int(i) for i in row]
+        heights.reverse()
+
+        my_col = 0
+        biggest = -1
+        for height in heights:
+            if biggest < height:
+                biggest = height
+                if not (my_row, len(X[0]) - 1 - my_col) in accounted_for:
+                    count+= 1
+                    accounted_for.add((my_row, len(X[0]) - 1 - my_col))
+            my_col += 1
+            
+        my_row += 1
+        
+    # Turn list of lines into 2d array of characters
+    Q = [list(line) for line in X]
+    
+    # Start from top and look down
+    for col in range(0, len(Q[0])):
+        heights = []
+        for row in range(0, len(Q)):
+            heights.append(int(Q[row][col]))
+        biggest = -1
+        my_row = 0
+        for height in heights:
+            if biggest < height:
+                biggest = height
+                if not (my_row, col) in accounted_for:
+                    count+= 1
+                    accounted_for.add((my_row, col))
                     
-            elif ('ls' in my_commands[0]):
-                curr_dir.my_ls =  my_commands[1:]
+            my_row += 1
+                
+    # Start from the bottom and look up
+    for col in range(0, len(Q[0])):
+        heights = []
+        for row in range(0, len(Q)):
+            heights.append(int(Q[row][col]))
+        heights.reverse()
 
-
-    # Recursively get sizes of entire tree.
-    root_dir.update_size()
+        biggest = -1
+        my_row = 0
+        for height in heights:
+            # Row is correct, but columns are flipped
+            if biggest < height:
+                biggest = height
+                if not (len(Q) - 1 - my_row, col) in accounted_for:
+                    count+= 1
+                    accounted_for.add((len(Q) - 1 - my_row, col))
+            my_row +=1
     
-    solution = 0
-    for dir in all_dirs:
-        if dir.size <= 100000:
-            solution += dir.size
-    
+    solution = count
+        
     print("Part 1 Solution: " + str(solution))
 
-# This creates a tree from the terminal input and returns the smallest file 
-# we could delete to get to 30000000 unused space.
+
+# This finds the "optimal" treehouse location by finding the tree that can see
+# the most trees horizontally/vertically.
 # This gives the answer to part 2.
-def part2():  
-    # Reset directories from part 1.
-    global all_dirs
-    all_dirs = []
+def part2():
+    X = [l.strip() for l in open('Day_8/input.txt')] 
+    Q = [list(line) for line in X]
     
-     # Get input into array
-    X = [l.strip() for l in open('Day_7/input.txt')]   
-    
-    # Split the input into commands + their output
-    Q =('\n'.join(X)).split("$ ")
-
-    root_dir = Directory('/', 0)
-    curr_dir = root_dir
-    for command in Q:
-        # Put the command into a nicer format and separate the command and it's
-        # output.
-        my_commands = [s.rstrip() for s in command.split('\n')]
-        if (len(my_commands) > 0):
-            if ('cd' in my_commands[0]):
-                name = ''.join(my_commands).split(' ')[1]
-                if (name == '..'):
-                    curr_dir = curr_dir.parent
-                # "cd /" is only run at the beginning, and we actually want to
-                # ignore it because we already have a root set up outside of the
-                # loop. That's what this does.
-                elif (name == '/'):
-                    pass
+    scenics = []
+    # Go through each row/col index and find its scenic score
+    for row in range(0, len(Q)):
+        for col in range(0, len(Q[0])):
+            my_height = Q[row][col]
+            
+            # 0 is left, 1 is right, 2 is up, and 3 is down.
+            scores = [0, 0, 0, 0]
+           
+             # Go left
+            for col_travel in range(col - 1, -1, -1):
+                if (Q[row][col_travel] < my_height):
+                    scores[0] += 1
+                # View is blocked
                 else:
-                    parent_dir = curr_dir
-                    curr_dir = Directory(name, parent_dir)
-                    parent_dir.add_child(curr_dir)
-                    
-            elif ('ls' in my_commands[0]):
-                curr_dir.my_ls =  my_commands[1:]
+                    scores[0] += 1
+                    break
+             # Go right
+            for col_travel in range(col + 1, len(Q[0]), 1):
+                if (Q[row][col_travel] < my_height):
+                    scores[1] += 1
+                # View is blocked
+                else:
+                    scores[1] += 1
+                    break
+            # Go up
+            for row_travel in range(row - 1, -1, -1):
+                if (Q[row_travel][col] < my_height):
+                    scores[2] += 1
+                # View is blocked
+                else:
+                    scores[2] += 1
+                    break
+            # Go down
+            for row_travel in range(row + 1, len(Q), 1):
+                if (Q[row_travel][col] < my_height):
+                    scores[3] += 1
+                # View is blocked
+                else:
+                    scores[3] += 1
+                    break
+                
+            # Calculate scenic scores based on score of each direction.
+            scenic_score = scores[0] * scores[1] * scores[2] * scores[3]
+            scenics.append(scenic_score)
+            
+    solution = max(scenics)
 
-
-    # Recursively get sizes of entire tree.
-    root_dir.update_size()
-    
-    used_space = root_dir.size
-
-    solution = -1
-    for dir in all_dirs:
-        if (70000000 - used_space) + dir.size >= 30000000 and (dir.size < solution or solution == -1):
-            solution = dir.size
-        
     print("Part 2 Solution: " + str(solution))
 
-
+    
 if __name__ == "__main__":
     print("hello!")
     
@@ -158,9 +169,9 @@ git clone https://github.com/Gidntsquia/AdventOfCode
 ## Code Structure 📁
 The code is broken up as follows:
 
-- [📁](Day_7)`Day_*`: Solutions for each day of advent of code. Click to be taken to today's solution
-    - [📋](Day_7/input.txt)`input.txt`: My puzzle input for today (Everyone's is different!)
-    - [🏃](Day_7/main.py)`main.py`: Solution file. Run to get puzzle solution for today (make sure to put in your unique input)
+- [📁](Day_8)`Day_*`: Solutions for each day of advent of code. Click to be taken to today's solution
+    - [📋](Day_8/input.txt)`input.txt`: My puzzle input for today (Everyone's is different!)
+    - [🏃](Day_8/main.py)`main.py`: Solution file. Run to get puzzle solution for today (make sure to put in your unique input)
 - [📁](Template)`Template`: Template for solutions. Feel free to take it
     - [📋](Template/input.txt)`input.txt`: Empty file where you can put in the day's puzzle input 
     - [🏃](Template/main.py)`main.py`: Skeleton of a python file where you can put in the day's puzzle solution.
