@@ -1,6 +1,4 @@
-import re
 import math
-import sys
 # Written by Jaxon Lee (GidntSquia)
 # Advent of Code Day 9
 # 12/9/2022
