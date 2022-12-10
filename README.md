@@ -94,7 +94,7 @@ The code is broken up as follows:
 
 - [📁](Day_10)`Day_*`: Solutions for each day of advent of code. Click to be taken to today's solution
     - [📋](Day_10/input.txt)`input.txt`: My puzzle input for today (Everyone's is different!)
-    - [🏃](Day_10/main.py)`main.py`: Solution file. Run to get puzzle solution for today (make sure to put in your unique input)
+    - [🏃](https://replit.com/@Gidntsquia/TodaysAoCSolution-Jaxon#main.py)`main.py`: Solution file. Run to get puzzle solution for today (make sure to put in your unique input)
 - [📁](Template)`Template`: Template for solutions. Feel free to take it
     - [📋](Template/input.txt)`input.txt`: Empty file where you can put in the day's puzzle input 
     - [🏃](Template/main.py)`main.py`: Skeleton of a python file where you can put in the day's puzzle solution.
