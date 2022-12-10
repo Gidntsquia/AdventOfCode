@@ -1,169 +1,85 @@
 # Advent Of Code 2022 🎄
 My code for December 2022's [Advent of Code](https://adventofcode.com) puzzles. All my solutions are in Python.
 
-## Today's Solution! (Day 9) 🤗
+## Today's Solution! (Day 10) 🤗
 ```
 import math
 # Written by Jaxon Lee (GidntSquia)
-# Advent of Code Day 9
-# 12/9/2022
+# Advent of Code Day 10
+# 12/10/2022
 #
 # Feel free to take whatever you'd like!
-
-
-def distance(p0, p1):
-    return math.sqrt((p0[0] - p1[0])**2 + (p0[1] - p1[1])**2)  
-
-def move(position, change):
-    return tuple(sum(x) for x in zip(position, change))
-
-# This gives the number of squares that the "tail" visited.
+  
+# This gets the signal strength during the cycles asked for in the question.
 # This gives the answer to part 1.
 def part1():
     solution = 0
-    X = [l.strip() for l in open('Day_9/input.txt')]
+    X = [l.strip() for l in open('Day_10/input.txt')]
+   
+    cycles = 0
+    x_val = 1
+    all_x_vals = []
     
-    # Starting positions
-    h_pos = (0, 0)
-    t_pos = (0, 0)
-    
-    # All potential directions
-    moves = {
-        'R': (0, 1),
-        'L': (0, -1),
-        'U': (1, 0),
-        'D': (-1, 0)
-    }
-    
-    visited = set([])
-    
-    visited.add(t_pos)
-
-    for commands in X:
-        # Get direction and amount we should go in that direction.
-        words = commands.split()
-        
-        direction = words[0]
-        
-        # Put unit "direction" into change a then iterate as many times as the 
-        # amount specifies.
-        change = moves[direction]
-        for i in range(0, int(words[1])):
-            # Move the head and then move the tail correspondingly.
-            h_pos = move(h_pos, change)
-            (hx, hy) = h_pos
-            (tx, ty) = t_pos
-            distance = (hx - tx, hy - ty)
-            match distance:
-                # Up
-                case (2, 0):
-                    t_pos = move(t_pos, moves['U'])
-                # Down 
-                case (-2, 0):
-                    t_pos = move(t_pos, moves['D'])
-                # Right
-                case (0, 2):
-                    t_pos = move(t_pos, moves['R'])
-                # Left
-                case (0, -2):
-                    t_pos = move(t_pos, moves['L'])
-                # Up and Right
-                case (1, 2) | (2, 1):
-                    t_pos = move(t_pos, moves['U'])
-                    t_pos = move(t_pos, moves['R'])
-                # Down and Right
-                case (-1, 2) | (-2, 1):
-                    t_pos = move(t_pos, moves['D'])
-                    t_pos = move(t_pos, moves['R'])
-                # Up and Left
-                case (1, -2) | (2, -1):
-                    t_pos = move(t_pos, moves['U'])
-                    t_pos = move(t_pos, moves['L'])
-                # Down and Left
-                case (-1, -2) | (-2, -1):
-                    t_pos = move(t_pos, moves['D'])
-                    t_pos = move(t_pos, moves['L'])
-                case _:
-                    pass 
-            visited.add(t_pos)
-    solution = len(visited)
+    for line in X:
+        words = line.split()
+        match words[0]:
+            case "noop":
+                cycles +=1
+                all_x_vals.append(x_val)
+            case "addx":
+                cycles += 1
+                all_x_vals.append(x_val)
+                
+                cycles += 1
+                all_x_vals.append(x_val)
+                x_val += int(words[1])
+    solution = all_x_vals[19]*20+all_x_vals[59]*60+all_x_vals[99]*100+all_x_vals[139]*140+all_x_vals[179]*180+all_x_vals[219]*220
     
     print("Part 1 Solution: " + str(solution))
 
-# This gives the number of squares that the 9th (last) tail finished.
+# This updates the pixels array in part 2.
+def update_pixels(pixels, x_val, cycles):
+    row = int((cycles - 1) / 40)
+    position = (cycles - 1) - 40 * row
+    if (abs(x_val - position) <= 1):
+        pixels[row][position] = "#"
+
+# This uses to the "X" value to draw a picture on a simulated CRT screen.
 # This gives the answer to part 2.
 def part2():
     solution = 0
-    X = [l.strip() for l in open('Day_9/input.txt')]
-    rope_positions = [(0,0) for i in range(0, 10)]
+    X = [l.strip() for l in open('Day_10/input.txt')]
+   
+    cycles = 0
+    x_val = 1
+    pixels = [["." for i in range(40)] for i in range(6)] 
+
+    for line in X:
+        words = line.split()
+        match words[0]:
+            case "noop":
+                cycles +=1 
+                update_pixels(pixels, x_val, cycles)
+            case "addx":
+                cycles += 1
+                update_pixels(pixels, x_val, cycles)
+                
+                cycles += 1
+                update_pixels(pixels, x_val, cycles)
+                
+                x_val += int(words[1])
+    for i in range(len(pixels)):
+        pixels[i] = ''.join(pixels[i])
+    pixels = '\n'.join(pixels)
     
-    # All potential directions
-    moves = {
-        'R': (0, 1),
-        'L': (0, -1),
-        'U': (1, 0),
-        'D': (-1, 0)
-    }
+    solution = pixels
     
-    visited = set([])
-    
-    visited.add((0,0))
-    for commands in X:
-        # Move the head and then move each of the tails correspondingly.
-        words = commands.split()
-        direction = words[0]
-        change = moves[direction]
-        for i in range(0, int(words[1])):
-            rope_positions[0] = move(rope_positions[0], change)
-            (hx, hy) = rope_positions[0]
-            
-            # Go through each of the tails and move them if needed.
-            for i in range(1, 10):
-                (tx, ty) = rope_positions[i]
-                distance = (hx - tx, hy - ty)
-                match distance:
-                    # Up
-                    case (2, 0):
-                        rope_positions[i] = move(rope_positions[i], moves['U'])
-                    # Down
-                    case (-2, 0):
-                        rope_positions[i] = move(rope_positions[i], moves['D'])
-                    # Right
-                    case (0, 2):
-                        rope_positions[i] = move(rope_positions[i], moves['R'])
-                    # Left
-                    case (0, -2):
-                        rope_positions[i] = move(rope_positions[i], moves['L'])
-                    # Up and Right
-                    case (1, 2) | (2, 1) | (2, 2):
-                        rope_positions[i] = move(rope_positions[i], moves['U'])
-                        rope_positions[i] = move(rope_positions[i], moves['R'])
-                    # Down and Right
-                    case (-1, 2) | (-2, 1) | (-2, 2):
-                        rope_positions[i] = move(rope_positions[i], moves['D'])
-                        rope_positions[i] = move(rope_positions[i], moves['R'])
-                    # Up and Left
-                    case (1, -2) | (2, -1) | (2, -2):
-                        rope_positions[i] = move(rope_positions[i], moves['U'])
-                        rope_positions[i] = move(rope_positions[i], moves['L'])
-                    # Down adn Left
-                    case (-1, -2) | (-2, -1) | (-2, -2):
-                        rope_positions[i] = move(rope_positions[i], moves['D'])
-                        rope_positions[i] = move(rope_positions[i], moves['L'])
-                    case _:
-                        pass 
-                # Update "head" to last rope's position
-                (hx, hy) = rope_positions[i]
-            
-            visited.add(rope_positions[9])
-    solution = len(visited)
-    
-    print("Part 2 Solution: " + str(solution))
+    # The solution is "PZGPKPEB"
+    print("Part 2 Solution:\n " + str(solution))
 
 
 if __name__ == "__main__":
     print("hello!")
-    
     
     part1()
     part2()
@@ -176,9 +92,9 @@ git clone https://github.com/Gidntsquia/AdventOfCode
 ## Code Structure 📁
 The code is broken up as follows:
 
-- [📁](Day_9)`Day_*`: Solutions for each day of advent of code. Click to be taken to today's solution
-    - [📋](Day_9/input.txt)`input.txt`: My puzzle input for today (Everyone's is different!)
-    - [🏃](Day_9/main.py)`main.py`: Solution file. Run to get puzzle solution for today (make sure to put in your unique input)
+- [📁](Day_10)`Day_*`: Solutions for each day of advent of code. Click to be taken to today's solution
+    - [📋](Day_10/input.txt)`input.txt`: My puzzle input for today (Everyone's is different!)
+    - [🏃](Day_10/main.py)`main.py`: Solution file. Run to get puzzle solution for today (make sure to put in your unique input)
 - [📁](Template)`Template`: Template for solutions. Feel free to take it
     - [📋](Template/input.txt)`input.txt`: Empty file where you can put in the day's puzzle input 
     - [🏃](Template/main.py)`main.py`: Skeleton of a python file where you can put in the day's puzzle solution.
