@@ -1,7 +1,7 @@
 # Advent Of Code 2022 🎄
-My code for December 2022's [Advent of Code](https://adventofcode.com) puzzles. All my solutions are in Python.
+My code for December 2022's [Advent of Code](https://adventofcode.com) puzzles. All my solutions are in Python 3.10.1.
 
-## Today's Solution! (Day 10) 🤗
+## Today's Solution! (Day 10) 🤗...[🏃](https://replit.com/@Gidntsquia/TodaysAoCSolution-Jaxon#main.py)
 ```
 import math
 # Written by Jaxon Lee (GidntSquia)
