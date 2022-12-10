@@ -7,8 +7,8 @@
 # 
 # This gives the answer to part 1.
 def part1():
-    X = [l.strip() for l in open('Day_???/input.txt')]
     solution = 0
+    X = [l.strip() for l in open('Day_???/input.txt')]
 
     
     print("Part 1 Solution: " + str(solution))
@@ -16,8 +16,8 @@ def part1():
 # 
 # This gives the answer to part 2.
 def part2():
-    X = [l.strip() for l in open('Day_???/input.txt')]
     solution = 0
+    X = [l.strip() for l in open('Day_???/input.txt')]
 
     
     print("Part 2 Solution: " + str(solution))
