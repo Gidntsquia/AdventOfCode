@@ -3,188 +3,127 @@ My code for December 2022's [Advent of Code](https://adventofcode.com) puzzles. 
 
 ## Today's Solution! (Day 10) 🤗...[🏃](https://replit.com/@Gidntsquia/TodaysAoCSolution-Jaxon#main.py)
 ```
-import re
+import math
 # Written by Jaxon Lee (GidntSquia)
-# Advent of Code Day 11
-# 12/11/2022
+# Advent of Code Day 12
+# 12/12/2022
 #
 # Feel free to take whatever you'd like!
-  
-class Monkey:
     
-      def __init__(self, items, operation, test, true_target, false_target):
-        self.items = items
-        self.operation = operation#lambda num: num * 10
-        self.divisor = test # lambda num:
-        self.true_target = true_target
-        self.false_target = false_target
-        self.num_inspections = 0
-        
-# 
+# Gives the shortest path up the mountain from S.
 # This gives the answer to part 1.
 def part1():
-    
-    all_monkeys = []
     solution = 0
-    X = [l.strip() for l in open('Day_11/input.txt')]
-    Q = '\n'.join(X)
-    Q = Q.split("\n\n")
+    X = [l.strip() for l in open('Day_12/input.txt')]
+    Q = []
+    for line in X:
+        line_of_chars = []
+        for i in range(len(line)):
+            line_of_chars.append(line[i:i+1])
+        Q.append(line_of_chars)
     
-    i = 0
-    for lines in Q:
-        monkey_data = lines.split('\n')
+    for row in range(len(Q)):
+        for col in range(len(Q[0])):
+            if Q[row][col] == "S":
+                start_pos = (row,col)
+                Q[row][col] = "a"
+            elif Q[row][col] == "E":
+                end_pos = (row,col)
+                Q[row][col] = "z"
         
-        items = list(map(int, re.findall(r'\d+', monkey_data[1])))
-        """
-        match i:
-            case 0:
-                operation = lambda x: x * 19
-            case 1:
-                operation = lambda x: x + 6
-            case 2:
-                operation = lambda x: x * x
-            case 3:
-                operation = lambda x: x + 3
-        """
-        match i:
-            case 0:
-                operation = lambda x: x * 17
-            case 1:
-                operation = lambda x: x + 2
-            case 2:
-                operation = lambda x: x + 1
-            case 3:
-                operation = lambda x: x + 7
-            case 4:
-                operation = lambda x: x * x
-            case 5:
-                operation = lambda x: x + 8
-            case 6:
-                operation = lambda x: x * 2
-            case 7:
-                operation = lambda x: x + 6
-        i += 1
-        divisor = int(re.search(r'\d+', monkey_data[3]).group())
-        
-        #test = lambda x: x % divisor == 0
-        #print(test(2080))
-        true_target = int(re.search(r'\d+', monkey_data[4]).group())
-        
-        false_target = int(re.search(r'\d+', monkey_data[5]).group())
-
-        
-        all_monkeys.append( Monkey(items, operation, divisor, true_target, false_target))
-        #print(items, operation, test, true_target, false_target )
-    rounds = 20
-    for i in range(0,rounds):
-        for monkey in all_monkeys:
-            for i in range(len(monkey.items)):
-                monkey.num_inspections += 1
-                item = monkey.items[i]
-                monkey.items[i] = monkey.operation(item)
-                monkey.items[i] = monkey.items[i] // 3
-                
-                #print(item, monkey.items[i], monkey.divisor,  monkey.items[i] % monkey.divisor == 0, monkey.true_target, monkey.false_target)
-                if monkey.items[i] % monkey.divisor == 0:
-                    all_monkeys[monkey.true_target].items.append(monkey.items[i])
-                else:
-                    all_monkeys[monkey.false_target].items.append(monkey.items[i])
-            monkey.items = []
-    all_inspections = []
-    for monkey in all_monkeys:
-        all_inspections.append(monkey.num_inspections)
-        #print(monkey.items)
-    all_inspections.sort()
-    solution = all_inspections[-2] * all_inspections[-1]
+    # Shortest path alg
+    distances = [[math.inf for i in range(len(Q[0]))] for i in range(0,len(Q))]
+    starty, startx = start_pos
+    distances[starty][startx] = 0
+    W = []
+    W.append(start_pos)
     
+    while len(W) > 0:
+        pos = W.pop(0)
+        (y, x) = pos
+        
+        directions = []
+        
+        # Go through each possible direction
+        directions.append((y - 1, x))
+        directions.append((y + 1, x))
+        directions.append((y, x - 1))
+        directions.append((y, x + 1))
+        
+        old_height = ord(Q[y][x])
+        for direction in directions:
+            new_y, new_x = direction
+            if (new_y >= 0 and new_y < len(Q) and new_x >= 0 and new_x < len(Q[0])):
+                if (distances[new_y][new_x] == math.inf):
+                    new_height = ord(Q[new_y][new_x])
+                    if (new_height - old_height <= 1):
+                        distances[new_y][new_x] = distances[y][x] + 1
+                        if (new_y, new_x) == end_pos:
+                            solution = distances[new_y][new_x]
+                            break
+                            
+                        W.append((new_y, new_x))
     print("Part 1 Solution: " + str(solution))
 
-# 
+# Gives the shortest path up the mountain from S or any point with elevation "a".
 # This gives the answer to part 2.
 def part2():
     solution = 0
-    X = [l.strip() for l in open('Day_11/input.txt')]
-     
-    all_monkeys = []
-    solution = 0
-    X = [l.strip() for l in open('Day_11/input.txt')]
-    Q = '\n'.join(X)
-    Q = Q.split("\n\n")
-    
-    i = 0
-    for lines in Q:
-        monkey_data = lines.split('\n')
+    X = [l.strip() for l in open('Day_12/input.txt')]
+    Q = []
+    for line in X:
+        line_of_chars = []
+        for i in range(len(line)):
+            line_of_chars.append(line[i:i+1])
+        Q.append(line_of_chars)
         
-        items = list(map(int, re.findall(r'\d+', monkey_data[1])))
-        """
-        match i:
-            case 0:
-                operation = lambda x: x * 19
-            case 1:
-                operation = lambda x: x + 6
-            case 2:
-                operation = lambda x: x * x
-            case 3:
-                operation = lambda x: x + 3
-        """
-        match i:
-            case 0:
-                operation = lambda x: x * 17
-            case 1:
-                operation = lambda x: x + 2
-            case 2:
-                operation = lambda x: x + 1
-            case 3:
-                operation = lambda x: x + 7
-            case 4:
-                operation = lambda x: x * x
-            case 5:
-                operation = lambda x: x + 8
-            case 6:
-                operation = lambda x: x * 2
-            case 7:
-                operation = lambda x: x + 6
-        i += 1
-        divisor = int(re.search(r'\d+', monkey_data[3]).group())
-        
-        #test = lambda x: x % divisor == 0
-        #print(test(2080))
-        true_target = int(re.search(r'\d+', monkey_data[4]).group())
-        
-        false_target = int(re.search(r'\d+', monkey_data[5]).group())
-
-        
-        all_monkeys.append( Monkey(items, operation, divisor, true_target, false_target))
-        #print(items, operation, test, true_target, false_target )
-    total_mod = 1
-    for monkey in all_monkeys:
-        total_mod *= monkey.divisor 
-    rounds = 10000
-    for i in range(0,rounds):
-        for monkey in all_monkeys:
-            for i in range(len(monkey.items)):
-                monkey.num_inspections += 1
-                item = monkey.items[i]
-                monkey.items[i] = monkey.operation(item)
-                monkey.items[i] = monkey.items[i]
-                monkey.items[i] = monkey.items[i] % total_mod
+    starts = []
+    for row in range(len(Q)):
+        for col in range(len(Q[0])):
+            if Q[row][col] == "S" or Q[row][col] == "a":
+                starts.append( (row,col))
+                Q[row][col] = "a"
+            elif Q[row][col] == "E":
+                end_pos = (row,col)
+                Q[row][col] = "z"
                 
-                #print(item, monkey.items[i], monkey.divisor,  monkey.items[i] % monkey.divisor == 0, monkey.true_target, monkey.false_target)
-                if monkey.items[i] % monkey.divisor == 0:
-                    all_monkeys[monkey.true_target].items.append(monkey.items[i])
-                else:
-                    all_monkeys[monkey.false_target].items.append(monkey.items[i])
-            monkey.items = []
-    all_inspections = []
-    for monkey in all_monkeys:
-        all_inspections.append(monkey.num_inspections)
-        #print(monkey.items)
-    all_inspections.sort()
-    solution = all_inspections[-2] * all_inspections[-1]
-
+    # Shortest path alg
+    distances = [[math.inf for i in range(len(Q[0]))] for i in range(0,len(Q))]
+    
+    W = []
+    for start in starts:
+        starty, startx = start
+        distances[starty][startx] = 0
+        W.append(start)
+    
+    while len(W) > 0:
+        pos = W.pop(0)
+        (y, x) = pos
+    
+        directions = []
+        
+        # Go through each possible direction
+        directions.append((y - 1, x))
+        directions.append((y + 1, x))
+        directions.append((y, x - 1))
+        directions.append((y, x + 1))
+        
+        old_height = ord(Q[y][x])
+        for direction in directions:
+            new_y, new_x = direction
+            if (new_y >= 0 and new_y < len(Q) and new_x >= 0 and new_x < len(Q[0])):                
+                if (distances[new_y][new_x] == math.inf):
+                    new_height = ord(Q[new_y][new_x])
+                    if (new_height - old_height <= 1):
+                        distances[new_y][new_x] = distances[y][x] + 1
+                        
+                        # This means we've found the end position. Could exit
+                        # the while loop here.
+                        if (new_y, new_x) == end_pos:
+                            solution = distances[new_y][new_x]
+                        W.append((new_y, new_x))
     
     print("Part 2 Solution: " + str(solution))
-
 
 if __name__ == "__main__":
     print("hello!")
@@ -200,8 +139,8 @@ git clone https://github.com/Gidntsquia/AdventOfCode
 ## Code Structure 📁
 The code is broken up as follows:
 
-- [📁](Day_10)`Day_*`: Solutions for each day of advent of code. Click to be taken to today's solution
-    - [📋](Day_10/input.txt)`input.txt`: My puzzle input for today (Everyone's is different!)
+- [📁](Day_12)`Day_*`: Solutions for each day of advent of code. Click to be taken to today's solution
+    - [📋](Day_12/input.txt)`input.txt`: My puzzle input for today (Everyone's is different!)
     - [🏃](https://replit.com/@Gidntsquia/TodaysAoCSolution-Jaxon#main.py)`main.py`: Solution file. Run to get puzzle solution for today (make sure to put in your unique input)
 - [📁](Template)`Template`: Template for solutions. Feel free to take it
     - [📋](Template/input.txt)`input.txt`: Empty file where you can put in the day's puzzle input 
