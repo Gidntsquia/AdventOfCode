@@ -1,8 +1,3 @@
-# Advent Of Code 2022 🎄
-My code for December 2022's [Advent of Code](https://adventofcode.com) puzzles. All my solutions are in Python 3.10.1.
-
-## Today's Solution! (Day 13) 🤗...[🏃](https://replit.com/@Gidntsquia/TodaysAoCSolution-Jaxon#main.py)
-```
 # Written by Jaxon Lee (GidntSquia)
 # Advent of Code Day 13
 # 12/13/2022
@@ -105,29 +100,3 @@ if __name__ == "__main__":
     print("hello!")
     
     solutions()
-```
-
-## Quickstart 🚀
-```
-git clone https://github.com/Gidntsquia/AdventOfCode
-```
-## Code Structure 📁
-The code is broken up as follows:
-
-- [📁](Day_13)`Day_*`: Solutions for each day of advent of code. Click to be taken to today's solution
-    - [📋](Day_13/input.txt)`input.txt`: My puzzle input for today (Everyone's is different!)
-    - [🏃](https://replit.com/@Gidntsquia/TodaysAoCSolution-Jaxon#main.py)`main.py`: Solution file. Run to get puzzle solution for today (make sure to put in your unique input)
-- [📁](Template)`Template`: Template for solutions. Feel free to take it
-    - [📋](Template/input.txt)`input.txt`: Empty file where you can put in the day's puzzle input 
-    - [🏃](Template/main.py)`main.py`: Skeleton of a python file where you can put in the day's puzzle solution.
-
-
----------------
-You can participate here:
-https://adventofcode.com/
-
-Join my private leaderboard! It has some UMD students 🐢
-
-Link- https://adventofcode.com/2022/leaderboard/private
-
-Code- 2114573-258bdd82
